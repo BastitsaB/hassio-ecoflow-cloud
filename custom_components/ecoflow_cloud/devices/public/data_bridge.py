@@ -57,7 +57,7 @@ def to_plain_other(raw_data: dict[str, any]) -> dict[str, any]:
         new_params = {}
 
         if "param" in raw_data:
-            if raw_data["addr"] == "ems":
+            if raw_data["addr"] == "ems" and raw_data["cmdId"] == 1:
                 phases = ["pcsAPhase", "pcsBPhase", "pcsCPhase"]
                 for i, phase in enumerate(phases):
                     for k, v in raw_data["param"][phase].items():
