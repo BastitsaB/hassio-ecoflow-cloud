@@ -12,7 +12,6 @@ from custom_components.ecoflow_cloud.sensor import (
     DecivoltSensorEntity, InWattsSolarSensorEntity, LevelSensorEntity,
     MiscSensorEntity, RemainSensorEntity, StatusSensorEntity, ReconnectStatusSensorEntity,
 )
-from .proto import ecopacket_pb2 as ecopacket, powerstream_pb2 as powerstream
 from ...api import EcoflowApiClient
 
 # from ..number import MinBatteryLevelEntity, MaxBatteryLevelEntity
@@ -92,7 +91,7 @@ class PowerStream(BaseDevice):
     def numbers(self, client: EcoflowApiClient) -> list[BaseNumberEntity]:
         return [
             # These will likely be some form of serialised data rather than JSON will look into it later
-            # MinBatteryLevelEntity(client, self,  "lowerLimit", "Min Disharge Level", 50, 100,
+            # MinBatteryLevelEntity(client, self,  "lowerLimit", "Min Discharge Level", 50, 100,
             #                       lambda value: {"moduleType": 0, "operateType": "TCP",
             #                                      "params": {"id": 00, "lowerLimit": value}}),
             # MaxBatteryLevelEntity(client, self,  "upperLimit", "Max Charge Level", 0, 30,
@@ -112,6 +111,7 @@ class PowerStream(BaseDevice):
 
     def _prepare_data(self, raw_data) -> dict[str, any]:
         raw = {"params": {}}
+        from .proto import ecopacket_pb2 as ecopacket, powerstream_pb2 as powerstream
         try:
             payload =raw_data
 
