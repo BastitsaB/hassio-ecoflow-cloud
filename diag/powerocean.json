@@ -1,0 +1,91 @@
+{
+  "integration_manifest": {
+    "domain": "ecoflow_cloud",
+    "name": "Ecoflow-Cloud",
+    "version": "0.7.0",
+    "documentation": "https://github.com/tolwi/hassio-ecoflow-cloud",
+    "issue_tracker": "https://github.com/tolwi/hassio-ecoflow-cloud/issues",
+    "requirements": ["paho-mqtt==1.6.1", "reactivex==4.0.4"],
+    "config_flow": true,
+    "codeowners": ["@tolwi"],
+    "iot_class": "cloud_push",
+    "is_built_in": false
+  },
+  "data": {
+    "data": {
+      "pcsAPhase.vol": 230,
+      "pcsAPhase.amp": 5.5,
+      "pcsAPhase.actPwr": 1200,
+      "pcsAPhase.reactPwr": 300,
+      "pcsAPhase.apparentPwr": 1240,
+      "pcsBPhase.vol": 229,
+      "pcsBPhase.amp": 5.3,
+      "pcsBPhase.actPwr": 1150,
+      "pcsBPhase.reactPwr": 280,
+      "pcsBPhase.apparentPwr": 1180,
+      "pcsCPhase.vol": 231,
+      "pcsCPhase.amp": 5.6,
+      "pcsCPhase.actPwr": 1250,
+      "pcsCPhase.reactPwr": 310,
+      "pcsCPhase.apparentPwr": 1280,
+      "mpptPv.vol": 48,
+      "mpptPv.amp": 12.5,
+      "mpptPv.pwr": 600,
+      "mpptPwr": 1800,
+      "bpSoc": 85,
+      "bpPwr": -500,
+      "sysLoadPwr": 700,
+      "sysGridPwr": -50,
+      "sectorA.tempCurr": 22.5,
+      "sectorB.tempCurr": 23.0,
+      "hpMaster.tempInlet": 24.2,
+      "hpMaster.tempOutlet": 26.5,
+      "hpMaster.tempAmbient": 18.0,
+      "sectorDhw.tempCurr": 45.0,
+      "emsErrCode.errCode": [601],
+      "errorCode": "AAAAAAAAAAA="
+    },
+    "set_commands": {
+      "123456001": {
+        "target_state": null,
+        "command": {
+          "from": "Android",
+          "id": "123456001",
+          "moduleType": 0,
+          "operateType": "TCP",
+          "params": {
+            "id": 72
+          },
+          "version": "1.0"
+        },
+        "reply": {
+          "id": 123456001,
+          "version": "1.0",
+          "operateType": "TCP",
+          "code": "0",
+          "data": {
+            "data": 8000,
+            "cmdSet": 32,
+            "ack": 0,
+            "id": 72
+          }
+        }
+      }
+    },
+    "get_commands": {
+      "252121000": {
+        "target_state": null,
+        "command": {
+          "from": "Android",
+          "id": "252121000",
+          "moduleType": 0,
+          "operateType": "latestQuotas",
+          "params": {},
+          "version": "1.0"
+        },
+        "reply": {}
+      }
+    },
+    "raw_data": []
+  }
+}
