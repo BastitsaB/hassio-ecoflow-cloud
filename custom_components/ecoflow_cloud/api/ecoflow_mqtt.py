@@ -86,11 +86,6 @@ class EcoflowMQTTClient:
 
     @callback
     def _on_message(self, client, userdata, message):
-    # Prüfe das Topic – nur /app/... sind relevant
-        if not message.topic.startswith("/app/"):
-            _LOGGER.debug("Skipping non-app topic: %s", message.topic)
-            return
-
         # Debug-Ausgabe
         if isinstance(message.payload, bytes):
             _LOGGER.debug("Raw MQTT payload (hex): %s", message.payload.hex())
