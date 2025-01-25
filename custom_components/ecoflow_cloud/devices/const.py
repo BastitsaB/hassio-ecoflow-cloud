@@ -276,3 +276,31 @@ MAIN_MODE = "Main mode"
 REMOTE_MODE = "Remote startup/shutdown"
 POWER_SUB_MODE = "Sub-mode"
 HEATING_ENABLED = "Heating Enabled"
+
+PHASE_A_VOLTAGE = "Phase A Voltage"
+PHASE_A_ACTIVE_POWER = "Phase A Active Power"
+PHASE_A_REACTIVE_POWER = "Phase A Reactive Power"
+PHASE_A_CURRENT = "Phase A Current"
+
+PHASE_B_VOLTAGE = "Phase B Voltage"
+PHASE_B_ACTIVE_POWER = "Phase B Active Power"
+PHASE_B_REACTIVE_POWER = "Phase B Reactive Power"
+PHASE_B_CURRENT = "Phase B Current"
+
+PHASE_C_VOLTAGE = "Phase C Voltage"
+PHASE_C_ACTIVE_POWER = "Phase C Active Power"
+PHASE_C_REACTIVE_POWER = "Phase C Reactive Power"
+PHASE_C_CURRENT = "Phase C Current"
+
+SYSTEM_LOAD_POWER = "System Load Power"
+GRID_POWER = "Grid Power"
+
+SOLAR_TOTAL_POWER = "Solar Total Power"
+SOLAR_VOLTAGE = "Solar Voltage"
+SOLAR_CURRENT = "Solar Current"
+
+ZONE_A_TEMPERATURE = "Zone A Temperature"
+ZONE_B_TEMPERATURE = "Zone B Temperature"
+INLET_TEMPERATURE = "Inlet Temperature"
+OUTLET_TEMPERATURE = "Outlet Temperature"
+AMBIENT_TEMPERATURE = "Ambient Temperature"
