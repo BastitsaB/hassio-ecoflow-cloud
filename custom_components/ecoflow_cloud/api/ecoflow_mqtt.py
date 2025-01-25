@@ -86,28 +86,43 @@ class EcoflowMQTTClient:
 
     @callback
     def _on_message(self, client, userdata, message):
-        # Optional: Prüfe am Topic, ob wir es überhaupt verarbeiten wollen:
+    # Prüfe das Topic – nur /app/... sind relevant
         if not message.topic.startswith("/app/"):
             _LOGGER.debug("Skipping non-app topic: %s", message.topic)
             return
 
-        # Debugausgabe
+        # Debug-Ausgabe
         if isinstance(message.payload, bytes):
-            _LOGGER.debug(f"Raw MQTT payload (hex): {message.payload.hex()}")
+            _LOGGER.debug("Raw MQTT payload (hex): %s", message.payload.hex())
         else:
-            _LOGGER.debug(f"Raw MQTT payload (str?): {message.payload}")
+            _LOGGER.debug("Raw MQTT payload (str?): %s", message.payload)
 
         raw_data = message.payload
+
+        # Versuche nur zu dekodieren, wenn es überhaupt nach JSON aussieht
         try:
             if isinstance(raw_data, bytes):
-                # Versuche JSON nur bei erkennbaren Textinhalten
+                # Wenn die Bytes nicht mit { oder [ anfangen, vermutlich kein JSON
+                if not raw_data or raw_data[0] not in (ord('{'), ord('[')):
+                    _LOGGER.debug("Binary payload doesn't look like JSON – skipping.")
+                    return
                 raw_data = raw_data.decode("utf-8")
+
+            elif isinstance(raw_data, str):
+                # Wenn der String nicht mit { oder [ anfängt, vermutlich kein JSON
+                if not (raw_data.startswith("{") or raw_data.startswith("[")):
+                    _LOGGER.debug("String payload doesn't look like JSON – skipping.")
+                    return
+
+            # Falls wir noch kein Dict haben, parse JSON
             if not isinstance(raw_data, dict):
                 raw_data = json.loads(raw_data)
+
         except (UnicodeDecodeError, json.JSONDecodeError) as e:
             _LOGGER.error("Error decoding JSON from payload: %s", e)
             return
 
+        # Jetzt ist raw_data ein Dict, direkt an die Geräte weiterreichen
         for (sn, device) in self.__devices.items():
             if device.update_data(raw_data, message.topic):
                 _LOGGER.debug("Message for %s and Topic %s", sn, message.topic)
