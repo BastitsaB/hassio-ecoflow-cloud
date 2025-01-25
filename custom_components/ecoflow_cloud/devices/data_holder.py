@@ -82,7 +82,7 @@ class EcoflowDataHolder:
             self.params_time = dt.utcnow()
 
         except Exception as error:
-            _LOGGER.error("Error updating data", error)
+            _LOGGER.error("Error updating data: %s", error)
 
     def __add_raw_data(self, raw: dict[str, Any]):
         if self.__collect_raw:
