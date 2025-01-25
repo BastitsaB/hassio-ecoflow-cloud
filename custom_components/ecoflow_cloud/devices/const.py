@@ -146,6 +146,7 @@ SOLAR_2_IN_AMPS = "Solar (2) In Amps"
 AC_IN_POWER = "AC In Power"
 AC_IN_VOLT = "AC In Volts"
 AC_OUT_VOLT = "AC Out Volts"
+GRID_CONNECTION = "Grid Connection"
 
 TYPE_C_IN_POWER = "Type-C In Power"
 SOLAR_IN_CURRENT = "Solar In Current"
@@ -267,6 +268,7 @@ ATTR_MAX_CELL_VOLT = MAX_CELL_VOLT
 BATTERY_AMP = "Battery Current"
 SLAVE_BATTERY_AMP = "Slave Battery Current"
 BATTERY_LEVEL_SOC = "Battery level SOC"
+BATTERY_SOC = "Battery SoC"
 
 FAN_MODE = "Wind speed"
 MAIN_MODE = "Main mode"

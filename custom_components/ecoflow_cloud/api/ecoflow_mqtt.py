@@ -87,18 +87,20 @@ class EcoflowMQTTClient:
     @callback
     def _on_message(self, client, userdata, message):
         try:
-            payload_str = message.payload.decode("utf-8")
-            raw = json.loads(payload_str)
-        except UnicodeDecodeError as e:
-            _LOGGER.error("Could not decode payload as UTF-8: %s", e)
-            return
-        except ValueError as e:
-            _LOGGER.error("Could not parse payload as valid JSON: %s", e)
-            return
+            # If message.payload is already a dict, we can skip decoding:
+            raw_data = message.payload
+            if isinstance(raw_data, bytes):
+                # Decode bytes to string, then parse JSON
+                raw_data_str = raw_data.decode("utf-8")
+                raw_data = json.loads(raw_data_str)
 
-        for (sn, device) in self.__devices.items():
-            if device.update_data(raw, message.topic):
-                _LOGGER.debug("Message for %s and Topic %s", sn, message.topic)
+            # Now raw_data should be a dict
+            for (sn, device) in self.__devices.items():
+                if device.update_data(raw_data, message.topic):
+                    _LOGGER.debug("Message for %s and Topic %s", sn, message.topic)
+        except Exception as e:
+            _LOGGER.error("Error in _on_message: %s", e)
+
     def send_get_message(self, device_sn: str, command: dict):
         payload = self.__prepare_payload(command)
         self.__send(self.__devices[device_sn].device_info.get_topic, json.dumps(payload))
