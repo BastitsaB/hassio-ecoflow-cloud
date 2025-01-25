@@ -86,25 +86,28 @@ class EcoflowMQTTClient:
 
     @callback
     def _on_message(self, client, userdata, message):
+        # Optional: Prüfe am Topic, ob wir es überhaupt verarbeiten wollen:
+        if not message.topic.startswith("/app/"):
+            _LOGGER.debug("Skipping non-app topic: %s", message.topic)
+            return
+
+        # Debugausgabe
         if isinstance(message.payload, bytes):
             _LOGGER.debug(f"Raw MQTT payload (hex): {message.payload.hex()}")
         else:
             _LOGGER.debug(f"Raw MQTT payload (str?): {message.payload}")
 
         raw_data = message.payload
-
         try:
             if isinstance(raw_data, bytes):
-                raw_data = raw_data.decode("utf-8")  # Jetzt String
-                raw_data = json.loads(raw_data)      # Jetzt Dict
-            elif not isinstance(raw_data, dict):
-                # Falls es ein String ist
+                # Versuche JSON nur bei erkennbaren Textinhalten
+                raw_data = raw_data.decode("utf-8")
+            if not isinstance(raw_data, dict):
                 raw_data = json.loads(raw_data)
         except (UnicodeDecodeError, json.JSONDecodeError) as e:
             _LOGGER.error("Error decoding JSON from payload: %s", e)
             return
 
-        # Jetzt ist raw_data ein Dict
         for (sn, device) in self.__devices.items():
             if device.update_data(raw_data, message.topic):
                 _LOGGER.debug("Message for %s and Topic %s", sn, message.topic)
