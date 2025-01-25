@@ -130,18 +130,22 @@ class BaseDevice(ABC):
 
 
     def _prepare_data(self, raw_data) -> dict[str, any]:
+    # Falls bereits ein dict, direkt zurück
+        if isinstance(raw_data, dict):
+            return raw_data
+
         try:
-            try:
+            # Falls raw_data bytes oder String ist => dekodieren
+            if isinstance(raw_data, bytes):
                 payload = raw_data.decode("utf-8", errors='ignore')
                 return json.loads(payload)
-            except UnicodeDecodeError as error:
-                _LOGGER.warning(f"UnicodeDecodeError: {error}. Trying to load json.")
+            else:
+                # Hier ist raw_data vermutlich ein String
                 return json.loads(raw_data)
-            except Exception as error:
-                _LOGGER.warning(f"Exception: {error}. Trying to load json.")
-                return json.loads(raw_data)
-        except Exception as error1:
-            _LOGGER.error(f"constant: {error1}. Ignoring message and waiting for the next one.")
+
+        except (UnicodeDecodeError, ValueError) as error1:
+            _LOGGER.error(f"Could not decode JSON payload: {error1}. Ignoring message.")
+            return {}
 
 class DiagnosticDevice(BaseDevice):
 
