@@ -19,9 +19,8 @@ from . import ECOFLOW_DOMAIN, ATTR_STATUS_SN, ATTR_STATUS_DATA_LAST_UPDATE, ATTR
 from .api import EcoflowApiClient
 from .devices import BaseDevice
 from .entities import BaseSensorEntity, EcoFlowAbstractEntity, EcoFlowDictEntity
-from custom_components.ecoflow_cloud.battery_manager import (
-    BatterySensorManager
-)
+from custom_components.ecoflow_cloud.battery_manager import BatterySensorManager
+from . import __init__ 
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -424,6 +423,19 @@ class SolarAmpSensorEntity(AmpSensorEntity):
 class SystemPowerSensorEntity(WattsSensorEntity):
     _attr_entity_category = None
     _attr_suggested_display_precision = 1
+
+    def __init__(self, client, device, key, name):
+        super().__init__(client, device, key, name)
+        self.key = key  # z.B. "sysGridPwr" oder "sysLoadPwr"
+
+    def update_from_coordinator(self):
+        params = self._device.data.params
+        self._state = params.get(self.key, "unknown")
+        _LOGGER.debug(f"SystemPowerSensorEntity ({self.key}) updated state to {self._state}")
+        self.schedule_update_ha_state()
+
+    def update(self):
+        self.update_from_coordinator()
 
 class ErrorListSensorEntity(BaseSensorEntity):
 

@@ -94,8 +94,8 @@ class EcoFlowDictEntity(EcoFlowAbstractEntity):
         # self.async_on_remove(d.dispose)
 
     def _handle_coordinator_update(self) -> None:
-        if self.coordinator.data.changed:
-            self._updated(self.coordinator.data.data_holder.params)
+        """Verarbeitet Updates vom Coordinator."""
+        self.update_from_coordinator()
 
     def _updated(self, data: dict[str, Any]):
         # update attributes
@@ -165,13 +165,23 @@ class BaseNumberEntity(NumberEntity, EcoFlowBaseCommandEntity):
 
 
 class BaseSensorEntity(SensorEntity, EcoFlowDictEntity):
+    """Basisklasse für alle EcoFlow Sensor-Entities."""
 
     def _update_value(self, val: Any) -> bool:
+        """Aktualisiert den nativen Wert des Sensors, falls er sich geändert hat."""
         if self._attr_native_value != val:
             self._attr_native_value = val
             return True
         else:
             return False
+
+    def update_from_coordinator(self):
+        """Liest die Daten aus dem Coordinator und aktualisiert den Sensor."""
+        params = self._device.data.params
+        value = params.get(self.mqtt_key, "unknown")
+        _LOGGER.debug(f"{self.name} ({self.mqtt_key}) updated with value: {value}")
+        if self._update_value(value):
+            self.schedule_update_ha_state()
 
 
 class BaseSwitchEntity(SwitchEntity, EcoFlowBaseCommandEntity):

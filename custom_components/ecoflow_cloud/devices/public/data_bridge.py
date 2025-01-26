@@ -63,14 +63,12 @@ def to_plain_other(raw_data: dict[str, any]) -> dict[str, any]:
             new_params[k] = v
 
         # Optional: bp_addr.* Einträge entpacken
-        # (z. B. "bp_addr.HJ32ZDH4ZF7E0051" enthält JSON als String)
         for key in list(new_params.keys()):
             if key.startswith("bp_addr.") and isinstance(new_params[key], str):
                 try:
                     sub_json = json.loads(new_params[key])
                     for sub_k, sub_val in sub_json.items():
                         new_params[f"{key}.{sub_k}"] = sub_val
-                    del new_params[key]
                 except Exception as exc:
                     _LOGGER.debug(
                         f"Unable to parse JSON in {key}: {new_params[key]} => {exc}"
