@@ -70,6 +70,7 @@ def to_plain_other(raw_data: dict[str, any]) -> dict[str, any]:
                     sub_json = json.loads(new_params[key])
                     for sub_k, sub_val in sub_json.items():
                         new_params[f"{key}.{sub_k}"] = sub_val
+                    del new_params[key]
                 except Exception as exc:
                     _LOGGER.debug(
                         f"Unable to parse JSON in {key}: {new_params[key]} => {exc}"

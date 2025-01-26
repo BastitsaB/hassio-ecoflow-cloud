@@ -48,6 +48,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         # 3) Koordinator-Listener registrieren
         # => Jedes Mal bei Update => rufe manager.process_quota_data + manager.update_existing_sensors
         def after_update():
+            _LOGGER.debug("after_update triggered for device: %s", device.device_info.sn)
             params = device.data.params
             manager.process_quota_data(params)
             manager.update_existing_sensors()

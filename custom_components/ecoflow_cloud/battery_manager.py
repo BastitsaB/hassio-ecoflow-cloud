@@ -22,12 +22,15 @@ class BatterySensorManager:
         self._battery_sensors: dict[str, BatteryModuleSensor] = {}
 
     def process_quota_data(self, raw_params: dict[str, any]):
+        _LOGGER.debug(f"BatterySensorManager.process_quota_data => got {len(raw_params)} keys")
+        _LOGGER.debug("process_quota_data => found %s keys in raw_params", len(raw_params))
         """
         Wird nach jedem Coordinator-Update aufgerufen,
         um in raw_params nach 'bp_addr.<SN>'-Feldern zu suchen und ggf. neue Entities anzulegen.
         """
         for key, val in raw_params.items():
             if not key.startswith("bp_addr."):
+                _LOGGER.debug(f"BatterySensorManager sees battery key = {key}")
                 continue
             # key z.B. "bp_addr.HJ32ZDH4ZF7E0051"
             # val z.B. ein JSON-String => {"bpSoc":17,"bpSoh":99,...}
