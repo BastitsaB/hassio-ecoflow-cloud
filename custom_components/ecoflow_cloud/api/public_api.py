@@ -99,7 +99,24 @@ class EcoflowPublicApiClient(EcoflowApiClient):
 
             url = f"{BASE_URI}{endpoint}?{params_str}"
             resp = await session.get(url, headers=headers)
-            return await self._get_json_response(resp)
+
+            # **Ab hier: raw Text loggen**
+            raw_text = await resp.text()
+            _LOGGER.debug(f"[call_api] Raw response from {endpoint}: {raw_text}")
+
+            # Dann JSON parsen
+            if resp.status != 200:
+                raise EcoflowException(f"Got HTTP status code {resp.status}: {resp.reason}")
+
+            try:
+                json_resp = await resp.json()
+            except Exception as error:
+                raise EcoflowException(f"Failed to parse JSON: {error}")
+
+            # Hier evtl. noch mal loggen, wenn du möchtest
+            _LOGGER.debug(f"[call_api] Parsed JSON from {endpoint}: {json_resp}")
+
+            return json_resp
 
     def __create_device_info(self, device_sn: str, device_name: str,
                              device_type: str, status: int = -1) -> EcoflowDeviceInfo:
