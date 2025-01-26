@@ -64,7 +64,8 @@ class PowerOcean(BaseDevice):
 
             StatusSensorEntity(client, self),
             ErrorListSensorEntity(client, self, "error_code.pcsErrCode.errCode", "PCS Error Codes"),
-            ErrorListSensorEntity(client, self, "error_code.emsErrCode.errCode", "EMS Error Codes")
+            ErrorListSensorEntity(client, self, "error_code.emsErrCode.errCode", "EMS Error Codes"),
+            
         ]
 
     def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
