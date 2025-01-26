@@ -30,7 +30,6 @@ class BatterySensorManager:
         """
         for key, val in raw_params.items():
             if not key.startswith("bp_addr."):
-                _LOGGER.debug(f"BatterySensorManager sees battery key = {key}")
                 continue
             # key z.B. "bp_addr.HJ32ZDH4ZF7E0051"
             # val z.B. ein JSON-String => {"bpSoc":17,"bpSoh":99,...}
