@@ -52,16 +52,23 @@ class EcoflowDeviceUpdateCoordinator(DataUpdateCoordinator[EcoflowBroadcastDataH
     def __init__(self, hass, holder: EcoflowDataHolder, refresh_period: int) -> None:
         """Initialize the coordinator."""
         super().__init__(hass, _LOGGER, name="Ecoflow update coordinator", always_update=True,
-                         update_interval= datetime.timedelta(seconds=max(refresh_period, 5)),
+                         update_interval= datetime.timedelta(seconds=max(refresh_period, 30)),
         )
         self.holder = holder
         self.__last_broadcast = dt.utcnow().replace(year=2000, month=1, day=1, hour=0, minute=0, second=0)
 
-    async def _async_update_data(self) -> EcoflowBroadcastDataHolder:
-        received_time = self.holder.last_received_time()
-        changed = self.__last_broadcast < received_time
-        self.__last_broadcast = received_time
-        return EcoflowBroadcastDataHolder(self.holder, changed)
+    async def _async_update_data(self):
+            try:
+                await self.client.quota_all(None)
+                _LOGGER.debug("Successfully updated all quotas from /device/quota/all")
+            except Exception as e:
+                _LOGGER.warning(f"Failed to fetch device quotas: {e}")
+
+            received_time = self.holder.last_received_time()
+            changed = self.__last_broadcast < received_time
+            self.__last_broadcast = received_time
+
+            return EcoflowBroadcastDataHolder(self.holder, changed)
 
 class BaseDevice(ABC):
 
