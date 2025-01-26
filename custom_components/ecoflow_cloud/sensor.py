@@ -19,13 +19,41 @@ from . import ECOFLOW_DOMAIN, ATTR_STATUS_SN, ATTR_STATUS_DATA_LAST_UPDATE, ATTR
 from .api import EcoflowApiClient
 from .devices import BaseDevice
 from .entities import BaseSensorEntity, EcoFlowAbstractEntity, EcoFlowDictEntity
+from custom_components.ecoflow_cloud.battery_manager import (
+    BatterySensorManager
+)
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+""" async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
     client: EcoflowApiClient = hass.data[ECOFLOW_DOMAIN][entry.entry_id]
     for (sn, device) in client.devices.items():
-        async_add_entities(device.sensors(client))
+        async_add_entities(device.sensors(client)) """
+async def async_setup_entry(hass, entry, async_add_entities):
+    client: EcoflowApiClient = hass.data[ECOFLOW_DOMAIN][entry.entry_id]
+
+    # 1) Für jedes Device => statische Sensoren
+    for sn, device in client.devices.items():
+        # Statische Sensoren
+        static_sensors = device.sensors(client)
+        async_add_entities(static_sensors)
+
+        # 2) BatterySensorManager anlegen
+        manager = BatterySensorManager(
+            add_entities_callback=async_add_entities, 
+            device=device, 
+            coordinator=device.coordinator
+        )
+
+        # 3) Koordinator-Listener registrieren
+        # => Jedes Mal bei Update => rufe manager.process_quota_data + manager.update_existing_sensors
+        def after_update():
+            params = device.data.params
+            manager.process_quota_data(params)
+            manager.update_existing_sensors()
+
+        device.coordinator.async_add_listener(after_update)
+        # => Done
 
 
 class MiscBinarySensorEntity(BinarySensorEntity, EcoFlowDictEntity):
@@ -395,3 +423,23 @@ class SolarAmpSensorEntity(AmpSensorEntity):
 class SystemPowerSensorEntity(WattsSensorEntity):
     _attr_entity_category = None
     _attr_suggested_display_precision = 1
+
+class ErrorListSensorEntity(BaseSensorEntity):
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:alert-circle-outline"
+    _attr_native_value = None
+
+    def _update_value(self, val: Any) -> bool:
+        # val sollte ein Array / Liste mit Errorcodes sein
+        if isinstance(val, list):
+            if len(val) == 0:
+                return super()._update_value("No errors")
+            # Ansonsten Komma-separieren
+            s = ",".join(str(x) for x in val)
+            return super()._update_value(s)
+        elif val is None:
+            return super()._update_value("No data")
+        else:
+            # Falls es ein einzelner Fehlercode ist
+            return super()._update_value(str(val))

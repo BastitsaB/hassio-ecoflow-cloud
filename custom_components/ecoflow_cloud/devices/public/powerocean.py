@@ -17,6 +17,8 @@ from custom_components.ecoflow_cloud.sensor import (
     SolarPowerSensorEntity,
     SolarAmpSensorEntity,
     SystemPowerSensorEntity,
+    EnergySensorEntity,
+    ErrorListSensorEntity,
 )
 from custom_components.ecoflow_cloud.switch import EnabledEntity
 
@@ -62,8 +64,13 @@ class PowerOcean(BaseDevice):
             WattsSensorEntity(client, self, "pcsCPhase.reactPwr", "pcsCPhase.reactPwr"),
             WattsSensorEntity(client, self, "pcsCPhase.apparentPwr", "pcsCPhase.apparentPwr"),
 
-
             StatusSensorEntity(client, self),
+            LevelSensorEntity(client, self, "bpCycles", "bpCycles"),
+            LevelSensorEntity(client, self, "bpSoh", "bpSoh"),
+            EnergySensorEntity(client, self, "bpAccuChgEnergy", "bpAccuChgEnergy"),
+            EnergySensorEntity(client, self, "bpAccuDsgEnergy", "bpAccuDsgEnergy"),
+            ErrorListSensorEntity(client, self, "error_code.pcsErrCode.errCode", "PCS Error Codes"),
+            ErrorListSensorEntity(client, self, "error_code.emsErrCode.errCode", "EMS Error Codes")
         ]
 
     def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
