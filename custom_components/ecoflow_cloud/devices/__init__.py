@@ -185,19 +185,19 @@ class BaseDevice(ABC):
             _LOGGER.error(f"Could not decode JSON payload: {error1}. Ignoring message.")
             return {}
 
-# class DiagnosticDevice(BaseDevice):
+class DiagnosticDevice(BaseDevice):
 
-#     def sensors(self, client: EcoflowApiClient) -> list[SensorEntity]:
-#         return []
+    def sensors(self, client: EcoflowApiClient) -> list[SensorEntity]:
+        return []
 
-#     def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
-#         return []
+    def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
+        return []
 
-#     def switches(self, client: EcoflowApiClient) -> list[SwitchEntity]:
-#         return []
+    def switches(self, client: EcoflowApiClient) -> list[SwitchEntity]:
+        return []
 
-#     def buttons(self, client: EcoflowApiClient) -> list[ButtonEntity]:
-#         return []
+    def buttons(self, client: EcoflowApiClient) -> list[ButtonEntity]:
+        return []
 
-#     def selects(self, client: EcoflowApiClient) -> list[SelectEntity]:
-#         return []
+    def selects(self, client: EcoflowApiClient) -> list[SelectEntity]:
+        return []
