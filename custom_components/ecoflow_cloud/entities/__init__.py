@@ -1,3 +1,5 @@
+# custom_components/ecoflow_cloud/entities/__init__.py
+
 from __future__ import annotations
 
 import inspect
@@ -127,7 +129,6 @@ class EcoFlowDictEntity(EcoFlowAbstractEntity):
     def _update_value(self, val: Any) -> bool:
         return False
 
-
 class EcoFlowBaseCommandEntity(EcoFlowDictEntity):
     def __init__(self, client: EcoflowApiClient, device: BaseDevice, mqtt_key: str, title: str,
                  command: Callable[[Any], dict[str, Any]] | Callable[[Any, dict[str, Any]], dict[str, Any]] | None,
@@ -148,7 +149,6 @@ class EcoFlowBaseCommandEntity(EcoFlowDictEntity):
     def send_set_message(self, target_value: Any, command: dict):
         self._client.mqtt_client.send_set_message(self._device.device_info.sn, {self._mqtt_key_adopted: target_value}, command)
 
-
 class BaseNumberEntity(NumberEntity, EcoFlowBaseCommandEntity):
     _attr_entity_category = EntityCategory.CONFIG
 
@@ -166,7 +166,6 @@ class BaseNumberEntity(NumberEntity, EcoFlowBaseCommandEntity):
             return True
         else:
             return False
-
 
 class BaseSensorEntity(SensorEntity, EcoFlowDictEntity):
     """Basisklasse für alle EcoFlow Sensor-Entities."""
@@ -192,14 +191,11 @@ class BaseSensorEntity(SensorEntity, EcoFlowDictEntity):
             self._update_value("unknown")
             self.schedule_update_ha_state()
 
-
 class BaseSwitchEntity(SwitchEntity, EcoFlowBaseCommandEntity):
     pass
 
-
 class BaseSelectEntity(SelectEntity, EcoFlowBaseCommandEntity):
     pass
-
 
 class BaseButtonEntity(ButtonEntity, EcoFlowBaseCommandEntity):
     pass

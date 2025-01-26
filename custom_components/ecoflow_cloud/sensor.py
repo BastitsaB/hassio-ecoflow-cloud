@@ -1,7 +1,6 @@
-# ecoflow_cloud/sensor.py
+# custom_components/ecoflow_cloud/sensor.py
 
 import logging
-import struct
 from typing import Any, Mapping, OrderedDict, Dict
 
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
@@ -495,43 +494,3 @@ class ErrorListSensorEntity(BaseSensorEntity):
         else:
             # Falls es ein einzelner Fehlercode ist
             return super()._update_value(str(val))
-        
-class BatteryModuleSensor(BaseSensorEntity):
-    """Sensor-Entity für ein einzelnes Batteriemodul."""
-
-    def __init__(self, client: EcoflowApiClient, device: BaseDevice, battery_key: str, name: str):
-        super().__init__(client, device, battery_key, name)
-        self.mqtt_key = battery_key  # z.B. "bp_addr.HJ32ZDH4ZF7E0051.bpSoc"
-
-    @property
-    def native_unit_of_measurement(self) -> str:
-        if self.mqtt_key.endswith("bpSoc"):
-            return PERCENTAGE
-        elif self.mqtt_key.endswith("bpCycles"):
-            return "cycles"
-        elif self.mqtt_key.endswith("bpAccuChgEnergy") or self.mqtt_key.endswith("bpAccuDsgEnergy"):
-            return UnitOfEnergy.WATT_HOUR
-        elif self.mqtt_key.endswith("bpTemp"):
-            return UnitOfTemperature.CELSIUS
-        else:
-            return None
-
-    @property
-    def device_class(self) -> str:
-        if self.mqtt_key.endswith("bpSoc"):
-            return SensorDeviceClass.BATTERY
-        elif self.mqtt_key.endswith("bpCycles"):
-            return None  # Kein spezifischer Device-Class
-        elif self.mqtt_key.endswith("bpAccuChgEnergy") or self.mqtt_key.endswith("bpAccuDsgEnergy"):
-            return SensorDeviceClass.ENERGY
-        elif self.mqtt_key.endswith("bpTemp"):
-            return SensorDeviceClass.TEMPERATURE
-        else:
-            return None
-
-    @property
-    def state_class(self) -> str:
-        if self.mqtt_key.endswith("bpAccuChgEnergy") or self.mqtt_key.endswith("bpAccuDsgEnergy"):
-            return SensorStateClass.TOTAL_INCREASING
-        else:
-            return SensorStateClass.MEASUREMENT
