@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 from typing import Any, Callable, OrderedDict, Mapping
 
 import jsonpath_ng.ext as jp
@@ -16,8 +17,11 @@ from custom_components.ecoflow_cloud import ECOFLOW_DOMAIN
 from custom_components.ecoflow_cloud.api import EcoflowApiClient
 from custom_components.ecoflow_cloud.devices import BaseDevice, EcoflowDeviceUpdateCoordinator
 
+_LOGGER = logging.getLogger(__name__)
 
 class EcoFlowAbstractEntity(CoordinatorEntity[EcoflowDeviceUpdateCoordinator]):
+    """Abstrakte Basisklasse für EcoFlow Entities."""
+
     _attr_has_entity_name = True
     _attr_should_poll = False
 
@@ -47,8 +51,8 @@ class EcoFlowAbstractEntity(CoordinatorEntity[EcoflowDeviceUpdateCoordinator]):
                 .replace(']', '-')
                 )
 
-
 class EcoFlowDictEntity(EcoFlowAbstractEntity):
+    """Basisklasse für Entities, die mit JSON-Daten arbeiten."""
 
     def __init__(self, client: EcoflowApiClient, device: BaseDevice, mqtt_key: str, title: str, enabled: bool = True,
                  auto_enable: bool = False):
@@ -98,14 +102,14 @@ class EcoFlowDictEntity(EcoFlowAbstractEntity):
         self.update_from_coordinator()
 
     def _updated(self, data: dict[str, Any]):
-        # update attributes
+        # Update attributes
         for key, title in self.__attributes_mapping.items():
             key_expr = jp.parse(self._adopt_json_key(key))
             attr_values = key_expr.find(data)
             if len(attr_values) == 1:
                 self.__attrs[title] = attr_values[0].value
 
-        # update value
+        # Update value
         values = self._mqtt_key_expr.find(data)
         if len(values) == 1:
             self._attr_available = True
@@ -179,8 +183,13 @@ class BaseSensorEntity(SensorEntity, EcoFlowDictEntity):
         """Liest die Daten aus dem Coordinator und aktualisiert den Sensor."""
         params = self._device.data.params
         value = params.get(self.mqtt_key, "unknown")
-        _LOGGER.debug(f"{self.name} ({self.mqtt_key}) updated with value: {value}")
-        if self._update_value(value):
+        if isinstance(value, (int, float, list)):
+            _LOGGER.debug(f"{self.name} ({self.mqtt_key}) updated with value: {value}")
+            if self._update_value(value):
+                self.schedule_update_ha_state()
+        else:
+            _LOGGER.warning(f"Invalid value for {self.name} ({self.mqtt_key}): {value}")
+            self._update_value("unknown")
             self.schedule_update_ha_state()
 
 

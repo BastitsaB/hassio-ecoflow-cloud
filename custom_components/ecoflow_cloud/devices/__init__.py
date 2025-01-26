@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 from abc import ABC, abstractmethod
+from typing import Any, Callable, Dict
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.components.number import NumberEntity
@@ -48,6 +49,17 @@ class EcoflowBroadcastDataHolder:
     data_holder: EcoflowDataHolder
     changed: bool
 
+class DeviceData:
+    """Klasse zur Speicherung von Gerätedaten."""
+
+    def __init__(self):
+        self.params: Dict[str, Any] = {}
+
+    def update_params(self, new_params: Dict[str, Any]):
+        """Aktualisiert die params mit neuen Daten."""
+        self.params.update(new_params)
+        _LOGGER.debug(f"DeviceData updated with params: {self.params}")
+
 class EcoflowDeviceUpdateCoordinator(DataUpdateCoordinator[EcoflowBroadcastDataHolder]):
     def __init__(self, hass, holder: EcoflowDataHolder, refresh_period: int, client) -> None:
         """Initialize the coordinator."""
@@ -82,7 +94,7 @@ class BaseDevice(ABC):
     def __init__(self, device_info: EcoflowDeviceInfo):
         super().__init__()
         self.coordinator = None
-        self.data = None
+        self.data = DeviceData()
         self.device_info: EcoflowDeviceInfo = device_info
         self.power_step: int = -1
 
@@ -100,6 +112,7 @@ class BaseDevice(ABC):
             refresh_period, 
             client  # ← Hier den Client übergeben
         )
+        self.coordinator.async_config_entry_first_refresh()
 
     @staticmethod
     def default_charging_power_step() -> int:
@@ -172,19 +185,19 @@ class BaseDevice(ABC):
             _LOGGER.error(f"Could not decode JSON payload: {error1}. Ignoring message.")
             return {}
 
-class DiagnosticDevice(BaseDevice):
+# class DiagnosticDevice(BaseDevice):
 
-    def sensors(self, client: EcoflowApiClient) -> list[SensorEntity]:
-        return []
+#     def sensors(self, client: EcoflowApiClient) -> list[SensorEntity]:
+#         return []
 
-    def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
-        return []
+#     def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
+#         return []
 
-    def switches(self, client: EcoflowApiClient) -> list[SwitchEntity]:
-        return []
+#     def switches(self, client: EcoflowApiClient) -> list[SwitchEntity]:
+#         return []
 
-    def buttons(self, client: EcoflowApiClient) -> list[ButtonEntity]:
-        return []
+#     def buttons(self, client: EcoflowApiClient) -> list[ButtonEntity]:
+#         return []
 
-    def selects(self, client: EcoflowApiClient) -> list[SelectEntity]:
-        return []
+#     def selects(self, client: EcoflowApiClient) -> list[SelectEntity]:
+#         return []
